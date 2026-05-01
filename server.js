@@ -189,13 +189,12 @@ const startServer = async () => {
         console.log('⚠️ Continuing without database connection - some features will not work');
     }
     
-    // Start HTTP server
+    // Start HTTP server - UPDATED to listen on 0.0.0.0 for Render
     try {
-        const server = app.listen(PORT, () => {
+        const server = app.listen(PORT, '0.0.0.0', () => {
             console.log('\n========================================');
             console.log(`🚀 SERVER IS RUNNING!`);
             console.log(`📍 URL: http://localhost:${PORT}`);
-            console.log(`🌐 Live URL: ${process.env.PUBLIC_URL || 'https://lesotho-transport-payment2.pxxl.click'}`);
             console.log('========================================\n');
             console.log('📝 Available Test Endpoints:');
             console.log(`   GET /                    - Root test`);
