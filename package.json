@@ -4,7 +4,7 @@
   "description": "Open-loop payment system for Lesotho public transport",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node working-server.js",
     "dev": "nodemon server.js",
     "test": "jest",
     "test:watch": "jest --watch",
