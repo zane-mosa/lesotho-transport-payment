@@ -1,4 +1,4 @@
-// src/routes/owner.js - Complete file with withdrawal tracking
+// src/routes/owner.js - Complete file with withdrawal tracking and delete functionality
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
@@ -237,6 +237,55 @@ router.get('/vehicle-transactions/:vehicleId', verifyOwner, async (req, res) => 
         });
     } catch (error) {
         console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete a single transaction
+router.delete('/transaction/:transactionId', verifyOwner, async (req, res) => {
+    try {
+        const { transactionId } = req.params;
+        
+        const transaction = await Transaction.findOne({
+            where: { transaction_id: transactionId },
+            include: [{
+                model: Vehicle,
+                where: { owner_id: req.user.id }
+            }]
+        });
+        
+        if (!transaction) {
+            return res.status(404).json({ error: 'Transaction not found or not owned by you' });
+        }
+        
+        await transaction.destroy();
+        res.json({ success: true, message: 'Transaction deleted successfully' });
+    } catch (error) {
+        console.error('Delete transaction error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete all transactions for a vehicle
+router.delete('/vehicle/:vehicleId/transactions', verifyOwner, async (req, res) => {
+    try {
+        const { vehicleId } = req.params;
+        
+        const vehicle = await Vehicle.findOne({
+            where: { vehicle_id: vehicleId, owner_id: req.user.id }
+        });
+        
+        if (!vehicle) {
+            return res.status(404).json({ error: 'Vehicle not found or not owned by you' });
+        }
+        
+        const deleted = await Transaction.destroy({
+            where: { vehicle_id: vehicleId }
+        });
+        
+        res.json({ success: true, message: `Deleted ${deleted} transactions` });
+    } catch (error) {
+        console.error('Delete vehicle transactions error:', error);
         res.status(500).json({ error: error.message });
     }
 });
